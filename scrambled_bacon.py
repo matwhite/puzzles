@@ -38,15 +38,26 @@ def matchem(la, lb):
 
 
 # Output grep statements to facilitate guesses
-def makegrep(a, b):
+def makegrep(a, b, d):
 
     def getem(l):
         return ''.join(possibs.get(l))
 
     print(
-        "grep -i '^[%s][%s][%s][%s]$' /usr/share/dict/words"
-        % tuple(map(getem, letts[a:b]))
+        (
+            "grep -i '^[%s][%s][%s][%s]%s$' /usr/share/dict/words | "
+            "tr 'A-Z' 'a-z' | sort | uniq"
+        )
+        % tuple(map(getem, letts[a:b]) + ["[a-z]" * d])
     )
+
+
+# Wrap grep statements for nice output
+def wrapgrep(a, b, n):
+    print("(")
+    for i in range(n):
+        makegrep(0, 4, i)
+    print(") | less")
 
 
 # Letter rules
@@ -159,16 +170,5 @@ for x in range(maxletts):
 print
 
 # Output grep statement for four letters before and after 'and' crib
-makegrep(0, 4)
-makegrep(7, 11)
-
-'''
-# Look for ways to limit letters
-for l in letts:
-    for p in possibs[l]:
-        rule = rules[p]
-        blanks = {}
-        for i, let in enumerate(l):
-            if store[let] == ' ':
-                blanks[let] = rule[i]
-'''
+wrapgrep(0, 4, 4)
+wrapgrep(7, 11, 4)
