@@ -1,9 +1,8 @@
-#!/usr/bin/python3
-
 from pprint import pprint as pp
 from collections import defaultdict
 from subprocess import check_output, CalledProcessError
 import re
+import sys
 
 '''
 Synopsis:
@@ -97,7 +96,7 @@ class Aristo(object):
         maps = defaultdict(list)
         for i, l in enumerate(word):
             maps[l].append(i)
-        for l in maps.keys():
+        for l in list(maps.keys()):
             if len(maps[l]) < 2:
                 del maps[l]
 
@@ -112,7 +111,7 @@ class Aristo(object):
         except CalledProcessError:
             return []
 
-        wlist = [s.strip() for s in out.splitlines()]
+        wlist = [s.strip().decode('ascii') for s in out.splitlines()]
 
         # Strip words where non-matching or matching letter rules fail
         proper = []
@@ -146,9 +145,16 @@ class Aristo(object):
 
     def repl(self):
         self.repout()
+        getin = None
+        try:
+            assert sys.version_info >= (3, 0)
+            getin = input
+        except:
+            getin = raw_input
+
         while True:
             try:
-                line = input()
+                line = getin()
             except:
                 break
 
